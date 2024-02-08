@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, NavbarMenuToggle, NavbarMenu, NavbarMenuItem} from "@nextui-org/react";
+import Logo from "../assets/Geriátrico Neuquén.png"
 
 function Nav() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,10 +17,10 @@ function Nav() {
         <NavbarContent>
           <NavbarMenuToggle
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-            className="sm:hidden"
+            className="sm:hidden text-white"
           />
           <NavbarBrand >
-            <Link href="/" className="text-2xl font-bold pl-4 sm:pl-0 text-white">Geriátrico Neuquén</Link>
+            <Link href="/" className="w-[260px] sm:w-[360px] "><img src={Logo} /></Link>
           </NavbarBrand>
         </NavbarContent>
         <NavbarContent className="hidden sm:flex gap-7" justify="center">
@@ -44,11 +45,11 @@ function Nav() {
             </Link>
           </NavbarItem>
         </NavbarContent>
-        <NavbarMenu className="pt-4 bg-pink">
+        <NavbarMenu className="pt-4">
         {menuItems.map((item, index) => (
           <NavbarMenuItem key={`${item.label}-${index}`}>
             <Link
-              className="w-full font-semibold text-black/90 "
+              className="w-full font-semibold text-black/90"
               href={item.href}
               size="lg"
             >
