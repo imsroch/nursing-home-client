@@ -5,11 +5,10 @@ function Nav() {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const menuItems = [
-      "Sobre Mí",
-      "Online",
-      "Presenciales",
-      "Personalizados",
-      "Formación Intensiva"
+      { label: "Inicio", href: "/" },
+      { label: "Institucional", href: "/institucional" },
+      { label: "Servicios", href: "/servicios" },
+      { label: "Contacto", href: "/contacto" }
     ];
   
     return (
@@ -20,7 +19,7 @@ function Nav() {
             className="sm:hidden"
           />
           <NavbarBrand >
-            <Link href="/" className="text-2xl font-bold pl-20 sm:pl-0 text-white">Geriátrico Neuquén</Link>
+            <Link href="/" className="text-2xl font-bold pl-4 sm:pl-0 text-white">Geriátrico Neuquén</Link>
           </NavbarBrand>
         </NavbarContent>
         <NavbarContent className="hidden sm:flex gap-7" justify="center">
@@ -46,15 +45,15 @@ function Nav() {
           </NavbarItem>
         </NavbarContent>
         <NavbarMenu className="pt-4 bg-pink">
-          {menuItems.map((item, index) => (
-            <NavbarMenuItem key={`${item}-${index}`} >
-              <Link
-                className="w-full font-semibold text-white "
-                href="#"
-                size="lg"
-              >
-                {item}
-              </Link>
+        {menuItems.map((item, index) => (
+          <NavbarMenuItem key={`${item.label}-${index}`}>
+            <Link
+              className="w-full font-semibold text-black/90 "
+              href={item.href}
+              size="lg"
+            >
+              {item.label}
+            </Link>
             </NavbarMenuItem>
           ))}
         </NavbarMenu>
