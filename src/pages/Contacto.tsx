@@ -1,5 +1,7 @@
 import {Button, Input, Textarea} from "@nextui-org/react";
 import  { useState } from 'react';
+import { useRef } from 'react';
+import emailjs from '@emailjs/browser';
 
 function Contacto() {
     const [estadoBoton, setEstadoBoton] = useState('ENVIAR');
@@ -18,15 +20,43 @@ function Contacto() {
         setEstadoBoton('ENVIAR');
         }, 4000);
     };
+
+    const form = useRef<HTMLFormElement>(null);
+   
+    const sendEmail = async (e: React.FormEvent) => {
+        e.preventDefault();
+      
+        if (form.current) {
+          try {
+            const response = await emailjs.sendForm(
+              'service_9rs64f8',
+              'template_j952md5',
+              form.current,
+              { publicKey: '8PJDW7kYZCuYbZOb9' }
+            );
+      
+            console.log('Correo enviado con éxito', response);
+          } catch (error) {
+            console.error('Error al enviar el correo', error);
+          }
+        } else {
+          console.error('El formulario es nulo');
+        }
+      };
+      
+  
+
   return (
     <div className="text-center flex flex-col items-center justify-center h-[841px] ">
         <h2 className="text-black/80 font-bold text-4xl sm:text-5xl mb-12 sm:mb-28">Contactános</h2>
         <div className="w-full flex flex-col sm:flex-row gap-4 items-center justify-center">
            <div className="flex w-full px-8 sm:px-0 sm:w-2/6 flex-col md:flex-nowrap mb-6 md:mb-0 gap-4">
-                <Input size="sm" type="text" label="Nombre Completo" variant="bordered"/>
-                <Input isRequired size="sm" type="email" label="Email" variant="bordered" />
-                <Input size="sm" type="text" label="Teléfono" variant="bordered" />
-                <Textarea isRequired size="sm" type="text" label="Consulta" variant="bordered" />
+               <form ref={form} onSubmit={sendEmail}>
+                <Input size="sm" type="text" label="Nombre Completo" variant="bordered" name="user_name" className="pb-2"/>
+                <Input isRequired size="sm" type="email" label="Email" variant="bordered" name="user_email" className="pb-2"/>
+                <Input size="sm" type="text" label="Teléfono" variant="bordered"  name="user_telephone" className="pb-2"/>
+                <Textarea isRequired size="sm" type="text" label="Consulta" variant="bordered"  name="message" className="pb-2"/>
+               </form>
                 <Button
                     isLoading={isLoading}
                     className={`w-2/3 m-auto ${estadoBoton === 'ENVIANDO' ? 'bg-green-700/50' : 'bg-green-700/90'} text-white font-bold`}
