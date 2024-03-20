@@ -20,7 +20,7 @@ const servicesData: Service[] = [
     icon: <GroupIcon className='text-white' fontSize='large' />,
     title: 'Área Preventivo Social',
     subtitle: 'Asistente Social',
-    roles: ['Psicóloga', 'Musicoterapeuta', 'Yoga ó Actividad Física', 'Laborterapia'],
+    roles: ['Psicóloga', 'Musicoterapeuta', 'Yoga ó Actividad Física', 'Terapia ocupacional', "Asistente Social"],
   },
   {
     icon: <WorkIcon className='text-white' fontSize='large' />,
