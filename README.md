@@ -1,30 +1,35 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# Geriatrico Neuquen Website
 
-Currently, two official plugins are available:
+This website serves as the digital front for Geriatrico Neuquen, a local geriatric care facility in Buenos Aires. It provides comprehensive information about the services offered, staff qualifications, and facility amenities, and includes a contact form powered by EmailJS for direct communication.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- Service Overview: Detailed descriptions of the care and services provided, including long-term stays, rehabilitation services, and specialized care plans.
+- Staff Profiles: Introductions to the qualified and compassionate team members who provide care and support.
+- Contact Form: Integrated with EmailJS, allowing visitors to easily inquire or communicate with the facility’s administration.
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- TypeScript: Used for writing scalable and maintainable code.
+- Tailwind CSS: Provides a utility-first approach to styling, facilitating a responsive and modern design that enhances the user experience.
+- EmailJS: Enables seamless email integration, allowing the facility to receive messages directly from the website without the need for a backend server.
 
-- Configure the top-level `parserOptions` property like this:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+## Installation
+
+Clone nursing-home-client
+
+```bash
+  git clone https://github.com/sofiarocher/nursing-home-client.git
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Install the packages 
+```bash
+  npm install
+```
+
+Run my nursing-home-client
+```bash
+  npm run start
+```
+    
