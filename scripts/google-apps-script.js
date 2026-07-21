@@ -3,12 +3,15 @@
  *
  * Setup:
  * 1. Creá una Sheet con headers en la fila 1:
- *    timestamp | vinculo | contacto | salud | motivos | cobertura | cud
+ *    timestamp | vinculo | whatsapp | wa_link | salud | motivos | cobertura | cud
  * 2. Pegá este script y guardá.
  * 3. Implementar → Nueva implementación → Tipo: Aplicación web
  *    - Ejecutar como: Yo
  *    - Quién tiene acceso: Cualquiera
  * 4. Copiá la URL (/exec) a .env.local como VITE_GOOGLE_SHEETS_URL
+ *
+ * whatsapp = número normalizado (ej. 5491161504440)
+ * wa_link  = https://wa.me/5491161504440 (clickeable en la Sheet)
  */
 
 function doPost(e) {
@@ -19,7 +22,8 @@ function doPost(e) {
     sheet.appendRow([
       data.timestamp || new Date().toISOString(),
       data.vinculo || "",
-      data.contacto || "",
+      data.whatsapp || "",
+      data.wa_link || "",
       data.salud || "",
       data.motivos || "",
       data.cobertura || "",

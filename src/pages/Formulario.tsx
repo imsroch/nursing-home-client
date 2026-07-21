@@ -5,7 +5,7 @@ type FormStatus = "idle" | "sending" | "success" | "error";
 
 type FormData = {
   vinculo: string;
-  contacto: string;
+  whatsapp: string;
   salud: string;
   motivos: string;
   cobertura: string;
@@ -14,12 +14,42 @@ type FormData = {
 
 const emptyForm: FormData = {
   vinculo: "",
-  contacto: "",
+  whatsapp: "",
   salud: "",
   motivos: "",
   cobertura: "",
   cud: "",
 };
+
+/** Normaliza un WhatsApp argentino a dígitos internacionales y link wa.me */
+function buildWhatsAppLink(raw: string): { number: string; link: string } | null {
+  let digits = raw.replace(/\D/g, "");
+  if (!digits) return null;
+
+  if (digits.startsWith("00")) {
+    digits = digits.slice(2);
+  }
+
+  // Local AR: 10 dígitos (ej. 1161504440) → 5491161504440
+  if (digits.length === 10) {
+    digits = `549${digits}`;
+  } else if (digits.startsWith("54") && !digits.startsWith("549") && digits.length >= 12) {
+    // 5411... → 54911...
+    digits = `549${digits.slice(2)}`;
+  } else if (digits.startsWith("9") && digits.length >= 10 && !digits.startsWith("54")) {
+    digits = `54${digits}`;
+  }
+
+  // AR móvil típico: 549 + área + número (13 dígitos), o internacional 11–15
+  if (digits.length < 11 || digits.length > 15) {
+    return null;
+  }
+
+  return {
+    number: digits,
+    link: `https://wa.me/${digits}`,
+  };
+}
 
 function Formulario() {
   const [formData, setFormData] = useState<FormData>(emptyForm);
@@ -43,9 +73,18 @@ function Formulario() {
       return;
     }
 
-    if (!formData.contacto.trim() || !formData.cud) {
+    if (!formData.whatsapp.trim() || !formData.cud) {
       setStatus("error");
-      setErrorMessage("Completá el contacto y si cuenta con CUD.");
+      setErrorMessage("Completá el WhatsApp y si cuenta con CUD.");
+      return;
+    }
+
+    const wa = buildWhatsAppLink(formData.whatsapp);
+    if (!wa) {
+      setStatus("error");
+      setErrorMessage(
+        "Ingresá un número de WhatsApp válido (ej: 11 6150-4440)."
+      );
       return;
     }
 
@@ -54,7 +93,8 @@ function Formulario() {
     const payload = {
       timestamp: new Date().toISOString(),
       vinculo: formData.vinculo.trim(),
-      contacto: formData.contacto.trim(),
+      whatsapp: wa.number,
+      wa_link: wa.link,
       salud: formData.salud.trim(),
       motivos: formData.motivos.trim(),
       cobertura: formData.cobertura.trim(),
@@ -148,12 +188,13 @@ function Formulario() {
         <Input
           isRequired
           size="sm"
-          type="text"
-          label="2. WhatsApp o correo electrónico"
-          description="Vía de contacto exclusiva para enviarte el presupuesto y la información"
+          type="tel"
+          inputMode="tel"
+          label="2. WhatsApp"
+          description="Solo número de WhatsApp. Ej: 11 6150-4440. Ahí te enviamos el presupuesto y la información."
           variant="bordered"
-          value={formData.contacto}
-          onValueChange={(value) => updateField("contacto", value)}
+          value={formData.whatsapp}
+          onValueChange={(value) => updateField("whatsapp", value)}
         />
 
         <Textarea
