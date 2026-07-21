@@ -1,13 +1,33 @@
-import Services from "../components/Services"
+import { motion } from 'framer-motion';
+import Services from '../components/Services';
+import { serviciosPage } from '../content/site';
 
 function Servicios() {
   return (
-    <div className="sm:py-20">
-        <h2 className="text-black/80 font-bold text-3xl px-4 sm:px-0 sm:text-5xl text-center pt-8 pb-8 sm:pb-12">Nuestro plan de trabajo.</h2>        
-        <p className="text-center px-4 sm:px-0 sm:w-2/5 m-auto pb-8 sm:pb-24">Descubrí nuestro enfoque integral para el bienestar de nuestros residentes, donde fusionamos cuidados médicos, atención de enfermería, asesoramiento nutricional y terapias físicas. Nuestro plan de trabajo incluye un abordaje psicológico y social, ofreciendo tratamientos especializados y talleres que se adaptan a las necesidades individuales. Las actividades del Área Psicológica/Social pueden ser individuales, familiares, grupales o comunitarias, diseñadas con objetivos específicos para abordar desafíos particulares, brindar orientación y contención. Este enfoque interdisciplinario se refleja en nuestras reuniones mensuales de Equipo Interdisciplinario, donde los directivos médicos y administrativos colaboran para garantizar una atención personalizada y efectiva para cada residente.</p>
+    <section id="servicios" className="scroll-mt-[5.5rem] bg-warm-50 py-16 sm:py-24">
+      <motion.header
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4 }}
+        className="mx-auto max-w-3xl px-4 text-center sm:px-6"
+      >
+        <span className="inline-block rounded-full bg-brand-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-700">
+          {serviciosPage.kicker}
+        </span>
+        <h2 className="mt-4 font-display text-3xl font-semibold text-brand-900 sm:text-5xl">
+          {serviciosPage.title}
+        </h2>
+        <p className="mt-6 text-base leading-relaxed text-brand-800/90 sm:text-lg">
+          {serviciosPage.intro}
+        </p>
+      </motion.header>
+
+      <div className="mt-14">
         <Services />
-    </div>
-  )
+      </div>
+    </section>
+  );
 }
 
-export default Servicios
+export default Servicios;

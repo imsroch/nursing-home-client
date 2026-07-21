@@ -1,22 +1,50 @@
+import { motion } from 'framer-motion';
+import { institucionalPage } from '../content/site';
 
 function Institucional() {
   return (
-    <div className="px-8 sm:px-0 sm:w-2/5 m-auto text-center sm:text-start">
-        <h2 className="text-black/80 font-bold text-3xl sm:text-5xl text-center pt-8 pb-8 sm:pb-12">Nuestras misiones y objetivos.</h2>
-        <div>
-            <span className="text-black/80 font-bold text-2xl sm:py-1 border-b-3 border-green-700 mt-4">Misión y Enfoque Institucional.</span>
-            <p className="text-black/80 text-lg py-4">El Establecimiento Geriátrico Neuquén se compromete a brindar un entorno cálido y respetuoso para los adultos mayores, reconociendo la complejidad de su situación al enfrentar los desafíos del envejecimiento y la adaptación a una nueva etapa de vida. Nuestra misión se centra en mejorar la calidad de vida de los residentes a través de un enfoque interdisciplinario, promoviendo la autonomía, la reflexión y la adaptación activa al entorno institucional. Buscamos ser un lugar donde la atención integral y el bienestar de los residentes son prioritarios.</p>
+    <section
+      id="institucional"
+      className="scroll-mt-[5.5rem] bg-warm-50 py-16 sm:py-24"
+    >
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <motion.header
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4 }}
+          className="mx-auto max-w-3xl text-center"
+        >
+          <span className="inline-block rounded-full bg-brand-100 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-brand-700">
+            {institucionalPage.kicker}
+          </span>
+          <h2 className="mt-4 font-display text-3xl font-semibold text-brand-900 sm:text-5xl">
+            {institucionalPage.title}
+          </h2>
+        </motion.header>
+
+        <div className="mt-14 space-y-8">
+          {institucionalPage.sections.map((section, index) => (
+            <motion.article
+              key={section.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ duration: 0.4, delay: index * 0.05 }}
+              className="rounded-2xl border border-brand-100 bg-white p-6 shadow-sm shadow-brand-900/5 sm:p-8"
+            >
+              <h3 className="font-display text-xl font-semibold text-brand-800 sm:text-2xl">
+                {section.title}
+              </h3>
+              <p className="mt-4 text-base leading-relaxed text-brand-800/90 sm:text-lg">
+                {section.body}
+              </p>
+            </motion.article>
+          ))}
         </div>
-        <div>
-            <span className="text-black/80 font-bold text-2xl sm:py-1 border-b-3 border-green-700 mt-4">Instalaciones y Servicios.</span>
-            <p className="text-black/80 text-lg py-4">Ubicado en el Barrio de Caballito, en la Ciudad Autónoma de Buenos Aires, el hogar geriátrico cuenta con instalaciones modernas y adaptadas a las necesidades de los adultos mayores. Con treinta y seis camas en total, distribuidas en distintos pisos, el establecimiento ofrece habitaciones cómodas, espacios de convivencia, salones de actividades y patios para promover un ambiente agradable. Nuestro equipo interdisciplinario, formado por profesionales comprometidos, se esfuerza por proporcionar servicios de calidad, contribuyendo así al bienestar integral de los residentes.</p>
-        </div>
-        <div>
-            <span className="text-black/80 font-bold text-2xl sm:py-1 border-b-3 border-green-700 mt-4">Objetivo General y Compromiso Continuo.</span>
-            <p className="text-black/80 text-lg pt-4 pb-8">El objetivo fundamental del Establecimiento Geriátrico Neuquén es favorecer el bienestar integral de los residentes a través de seguimientos continuos y estrategias de intervención personalizadas. Nos esforzamos por crear un ambiente donde cada adulto mayor se sienta cuidado, apoyado y respetado en su individualidad. Al promover la calidad de vida en el contexto institucional, buscamos establecer acciones que no solo aborden las necesidades físicas, sino también aquellas relacionadas con el desarrollo cognitivo, la autonomía y la adaptación activa, manteniendo siempre un enfoque humano y ético en nuestra labor diaria.</p>
-        </div>
-    </div>
-  )
+      </div>
+    </section>
+  );
 }
 
-export default Institucional
+export default Institucional;
