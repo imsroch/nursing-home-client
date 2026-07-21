@@ -9,7 +9,8 @@ function Nav() {
       { label: "Inicio", href: "/" },
       { label: "Institucional", href: "/institucional" },
       { label: "Servicios", href: "/servicios" },
-      { label: "Contacto", href: "/contacto" }
+      { label: "Contacto", href: "/contacto" },
+      { label: "Formulario", href: "/formulario" },
     ];
   
     return (
@@ -42,6 +43,11 @@ function Nav() {
           <NavbarItem>
             <Link href="/contacto" className="font-bold text-white">
               Contacto
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link href="/formulario" className="font-bold text-white">
+              Formulario
             </Link>
           </NavbarItem>
         </NavbarContent>
