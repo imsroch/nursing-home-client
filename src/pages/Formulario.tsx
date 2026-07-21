@@ -239,9 +239,23 @@ function Formulario() {
         </RadioGroup>
 
         {status === "success" && (
-          <p className="text-green-800 text-sm font-medium text-center">
-            Gracias. Recibimos tus datos y te contactaremos a la brevedad.
-          </p>
+          <div className="flex flex-col items-center gap-3 text-center mt-2 py-4">
+            <p className="text-green-800 text-base sm:text-lg font-semibold">
+              ¡Listo! Recibimos tus datos.
+            </p>
+            <p className="text-black/70 text-sm sm:text-base">
+              Si preferís, escribinos ahora por WhatsApp:
+            </p>
+            <Button
+              as="a"
+              href="https://wa.me/5491161504440"
+              target="_blank"
+              rel="noreferrer"
+              className="w-2/3 bg-green-700/90 text-white font-bold"
+            >
+              Contactanos por WhatsApp
+            </Button>
+          </div>
         )}
         {status === "error" && errorMessage && (
           <p className="text-red-700 text-sm font-medium text-center">
@@ -249,16 +263,18 @@ function Formulario() {
           </p>
         )}
 
-        <Button
-          type="submit"
-          isLoading={status === "sending"}
-          disabled={status === "sending"}
-          className={`w-2/3 m-auto mt-2 ${
-            status === "sending" ? "bg-green-700/50" : "bg-green-700/90"
-          } text-white font-bold`}
-        >
-          {buttonLabel}
-        </Button>
+        {status !== "success" && (
+          <Button
+            type="submit"
+            isLoading={status === "sending"}
+            disabled={status === "sending"}
+            className={`w-2/3 m-auto mt-2 ${
+              status === "sending" ? "bg-green-700/50" : "bg-green-700/90"
+            } text-white font-bold`}
+          >
+            {buttonLabel}
+          </Button>
+        )}
       </form>
     </div>
   );
