@@ -1,27 +1,38 @@
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import Footer from './components/Footer';
-import Nav from './components/Navbar';
-import Home from './pages/Home';
+import Navbar from './components/Navbar';
 import Contacto from './pages/Contacto';
 import Formulario from './pages/Formulario';
+import Home from './pages/Home';
 import Institucional from './pages/Institucional';
 import Servicios from './pages/Servicios';
 
-function App() {
+function Landing() {
   return (
     <>
-      <Router>
-        <Nav />
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/institucional' element={<Institucional />} />
-          <Route path='/servicios' element={<Servicios />} />
-          <Route path='/contacto' element={<Contacto />} />
-          <Route path='/formulario' element={<Formulario />} />
-        </Routes>
-        <Footer />
-      </Router>
+      <Home />
+      <Institucional />
+      <Servicios />
+      <Contacto />
     </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="flex min-h-screen flex-col">
+        <Navbar />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Landing />} />
+            <Route path="/formulario" element={<Formulario />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   );
 }
 
