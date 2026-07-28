@@ -219,7 +219,7 @@ function Formulario() {
     goTo(stepIndex - 1);
   };
 
-  const submitForm = async () => {
+  const submitForm = async (cudValue = formData.cud) => {
     setErrorMessage('');
 
     const sheetsUrl = import.meta.env.VITE_GOOGLE_SHEETS_URL;
@@ -240,7 +240,7 @@ function Formulario() {
       return;
     }
 
-    if (!formData.cud) {
+    if (!cudValue) {
       setStatus('error');
       setErrorMessage('Elegí si cuenta con CUD.');
       return;
@@ -256,7 +256,7 @@ function Formulario() {
       salud: formData.salud.trim(),
       motivos: formData.motivos.trim(),
       cobertura: formData.cobertura.trim(),
-      cud: formData.cud,
+      cud: cudValue,
     };
 
     try {
@@ -301,7 +301,7 @@ function Formulario() {
     updateField('cud', value);
     window.setTimeout(() => {
       setDirection(1);
-      void submitForm();
+      void submitForm(value);
     }, reduceMotion ? 0 : 220);
   };
 
