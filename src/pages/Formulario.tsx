@@ -61,7 +61,8 @@ const steps: Step[] = [
     id: 'whatsapp',
     kind: 'tel',
     question: '¿A qué WhatsApp te contactamos?',
-    helper: 'Solo número. Ahí te enviamos el presupuesto y la información.',
+    helper:
+      'Código de área + número, sin 15 (10 dígitos). Ej: 11 6150-4440. Ahí te enviamos el presupuesto.',
     placeholder: '11 6150-4440',
     required: true,
   },
@@ -95,8 +96,8 @@ const steps: Step[] = [
 ];
 
 const questionSteps = steps.filter((step) => step.kind !== 'welcome');
+const WHATSAPP_STEP_INDEX = steps.findIndex((step) => step.id === 'whatsapp');
 
-/** Normaliza un WhatsApp argentino a dígitos internacionales y link wa.me */
 function buildWhatsAppLink(raw: string): { number: string; link: string } | null {
   let digits = raw.replace(/\D/g, '');
   if (!digits) return null;
@@ -107,13 +108,13 @@ function buildWhatsAppLink(raw: string): { number: string; link: string } | null
 
   if (digits.length === 10) {
     digits = `549${digits}`;
-  } else if (digits.startsWith('54') && !digits.startsWith('549') && digits.length >= 12) {
+  } else if (digits.startsWith('54') && !digits.startsWith('549') && digits.length === 12) {
     digits = `549${digits.slice(2)}`;
-  } else if (digits.startsWith('9') && digits.length >= 10 && !digits.startsWith('54')) {
+  } else if (digits.startsWith('9') && digits.length === 11) {
     digits = `54${digits}`;
   }
 
-  if (digits.length < 11 || digits.length > 15) {
+  if (!/^549\d{10}$/.test(digits)) {
     return null;
   }
 
@@ -123,6 +124,14 @@ function buildWhatsAppLink(raw: string): { number: string; link: string } | null
   };
 }
 
+function whatsappStepError(raw: string): string | null {
+  if (!raw.trim()) return 'Ingresá un número de WhatsApp.';
+  if (!buildWhatsAppLink(raw)) {
+    return 'WhatsApp inválido. Usá código de área + número (10 dígitos). Ej: 11 6150-4440';
+  }
+  return null;
+}
+
 function Formulario() {
   const reduceMotion = useReducedMotion();
   const [stepIndex, setStepIndex] = useState(0);
@@ -130,6 +139,7 @@ function Formulario() {
   const [formData, setFormData] = useState<FormData>(emptyForm);
   const [status, setStatus] = useState<FormStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [whatsappTouched, setWhatsappTouched] = useState(false);
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | null>(null);
 
   const step = steps[stepIndex]!;
@@ -150,6 +160,16 @@ function Formulario() {
 
   const updateField = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+
+    if (field === 'whatsapp') {
+      if (whatsappTouched) {
+        setErrorMessage(whatsappStepError(value) ?? '');
+      } else if (errorMessage) {
+        setErrorMessage('');
+      }
+      return;
+    }
+
     if (errorMessage) setErrorMessage('');
   };
 
@@ -157,11 +177,8 @@ function Formulario() {
     if (step.kind === 'welcome') return null;
 
     if (step.kind === 'tel') {
-      if (!formData.whatsapp.trim()) return 'Ingresá un número de WhatsApp.';
-      if (!buildWhatsAppLink(formData.whatsapp)) {
-        return 'Ingresá un WhatsApp válido (ej: 11 6150-4440).';
-      }
-      return null;
+      setWhatsappTouched(true);
+      return whatsappStepError(formData.whatsapp);
     }
 
     if (step.kind === 'choice' && step.required && !formData.cud) {
@@ -176,9 +193,9 @@ function Formulario() {
     return null;
   };
 
-  const goTo = (nextIndex: number) => {
+  const goTo = (nextIndex: number, keepError = false) => {
     setDirection(nextIndex > stepIndex ? 1 : -1);
-    setErrorMessage('');
+    if (!keepError) setErrorMessage('');
     setStepIndex(nextIndex);
   };
 
@@ -215,9 +232,17 @@ function Formulario() {
     }
 
     const wa = buildWhatsAppLink(formData.whatsapp);
-    if (!wa || !formData.cud) {
+    if (!wa) {
+      setStatus('idle');
+      setWhatsappTouched(true);
+      setErrorMessage(whatsappStepError(formData.whatsapp) ?? 'WhatsApp inválido.');
+      if (WHATSAPP_STEP_INDEX >= 0) goTo(WHATSAPP_STEP_INDEX, true);
+      return;
+    }
+
+    if (!formData.cud) {
       setStatus('error');
-      setErrorMessage('Revisá el WhatsApp y la respuesta de CUD.');
+      setErrorMessage('Elegí si cuenta con CUD.');
       return;
     }
 
@@ -265,6 +290,14 @@ function Formulario() {
   };
 
   const selectChoice = (value: string) => {
+    const whatsappError = whatsappStepError(formData.whatsapp);
+    if (whatsappError) {
+      setWhatsappTouched(true);
+      setErrorMessage(whatsappError);
+      if (WHATSAPP_STEP_INDEX >= 0) goTo(WHATSAPP_STEP_INDEX, true);
+      return;
+    }
+
     updateField('cud', value);
     window.setTimeout(() => {
       setDirection(1);
@@ -299,6 +332,10 @@ function Formulario() {
         ? 'Enviando...'
         : 'Enviar'
       : 'OK';
+  const normalizedWhatsapp =
+    step.kind === 'tel' && whatsappTouched
+      ? buildWhatsAppLink(formData.whatsapp)
+      : null;
 
   return (
     <section className="relative min-h-[calc(100vh-4.5rem)] overflow-hidden bg-warm-50">
@@ -444,17 +481,32 @@ function Formulario() {
                           className="w-full resize-none border-0 border-b-2 border-brand-200 bg-transparent px-0 py-3 text-2xl text-brand-900 outline-none transition placeholder:text-brand-300 focus:border-brand-600"
                         />
                       ) : (
-                        <input
-                          ref={(el) => {
-                            inputRef.current = el;
-                          }}
-                          type={step.kind === 'tel' ? 'tel' : 'text'}
-                          inputMode={step.kind === 'tel' ? 'tel' : 'text'}
-                          value={formData[step.id]}
-                          onChange={(e) => updateField(step.id, e.target.value)}
-                          placeholder={step.placeholder}
-                          className="w-full border-0 border-b-2 border-brand-200 bg-transparent px-0 py-3 text-2xl text-brand-900 outline-none transition placeholder:text-brand-300 focus:border-brand-600"
-                        />
+                        <>
+                          <input
+                            ref={(el) => {
+                              inputRef.current = el;
+                            }}
+                            type={step.kind === 'tel' ? 'tel' : 'text'}
+                            inputMode={step.kind === 'tel' ? 'tel' : 'text'}
+                            autoComplete={step.kind === 'tel' ? 'tel' : 'on'}
+                            value={formData[step.id]}
+                            onChange={(e) => updateField(step.id, e.target.value)}
+                            onBlur={(e) => {
+                              if (step.kind !== 'tel') return;
+                              setWhatsappTouched(true);
+                              setErrorMessage(
+                                whatsappStepError(e.target.value) ?? '',
+                              );
+                            }}
+                            placeholder={step.placeholder}
+                            className="w-full border-0 border-b-2 border-brand-200 bg-transparent px-0 py-3 text-2xl text-brand-900 outline-none transition placeholder:text-brand-300 focus:border-brand-600"
+                          />
+                          {normalizedWhatsapp && (
+                            <p className="mt-2 text-sm text-brand-700/70">
+                              Se guardará como +{normalizedWhatsapp.number}
+                            </p>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
