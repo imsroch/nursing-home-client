@@ -132,6 +132,30 @@ function whatsappStepError(raw: string): string | null {
   return null;
 }
 
+function sanitizePhoneInput(value: string): string {
+  return value.replace(/[^\d\s+\-().]/g, '');
+}
+
+function sanitizeTextInput(value: string): string {
+  return value.replace(/[^\p{L}\s/'’.,\-()¿?¡!]/gu, '');
+}
+
+function sanitizeTextareaInput(value: string): string {
+  return value.replace(/[^\p{L}\p{N}\s/'’.,\-()¿?¡!%:;]/gu, '');
+}
+
+function textStepError(raw: string): string | null {
+  const value = raw.trim();
+  if (!value) return null;
+  if (!/\p{L}/u.test(value)) {
+    return 'Escribí texto (letras), no solo números.';
+  }
+  if (/^\d+$/.test(value.replace(/\s/g, ''))) {
+    return 'Escribí texto (letras), no solo números.';
+  }
+  return null;
+}
+
 function Formulario() {
   const reduceMotion = useReducedMotion();
   const [stepIndex, setStepIndex] = useState(0);
@@ -158,15 +182,36 @@ function Formulario() {
     return () => window.clearTimeout(timer);
   }, [stepIndex, status, isWelcome]);
 
-  const updateField = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const sanitizeFieldValue = (
+    field: keyof FormData,
+    value: string,
+    kind: 'text' | 'tel' | 'textarea' | 'choice' | 'welcome',
+  ): string => {
+    if (field === 'whatsapp' || kind === 'tel') return sanitizePhoneInput(value);
+    if (kind === 'textarea') return sanitizeTextareaInput(value);
+    if (kind === 'text') return sanitizeTextInput(value);
+    return value;
+  };
+
+  const updateField = (
+    field: keyof FormData,
+    value: string,
+    kind: 'text' | 'tel' | 'textarea' | 'choice' | 'welcome' = 'text',
+  ) => {
+    const nextValue = sanitizeFieldValue(field, value, kind);
+    setFormData((prev) => ({ ...prev, [field]: nextValue }));
 
     if (field === 'whatsapp') {
       if (whatsappTouched) {
-        setErrorMessage(whatsappStepError(value) ?? '');
+        setErrorMessage(whatsappStepError(nextValue) ?? '');
       } else if (errorMessage) {
         setErrorMessage('');
       }
+      return;
+    }
+
+    if (kind === 'text' || kind === 'textarea') {
+      setErrorMessage(textStepError(nextValue) ?? '');
       return;
     }
 
@@ -185,9 +230,13 @@ function Formulario() {
       return 'Elegí una opción para continuar.';
     }
 
-    if ('required' in step && step.required && step.kind !== 'choice') {
+    if (step.kind === 'text' || step.kind === 'textarea') {
       const value = formData[step.id].trim();
-      if (!value) return 'Completá este campo para continuar.';
+      if ('required' in step && step.required && !value) {
+        return 'Completá este campo para continuar.';
+      }
+      if (value) return textStepError(value);
+      return null;
     }
 
     return null;
@@ -298,7 +347,7 @@ function Formulario() {
       return;
     }
 
-    updateField('cud', value);
+    updateField('cud', value, 'choice');
     window.setTimeout(() => {
       setDirection(1);
       void submitForm(value);
@@ -476,7 +525,9 @@ function Formulario() {
                           }}
                           rows={4}
                           value={formData[step.id]}
-                          onChange={(e) => updateField(step.id, e.target.value)}
+                          onChange={(e) =>
+                            updateField(step.id, e.target.value, 'textarea')
+                          }
                           placeholder={step.placeholder}
                           className="w-full resize-none border-0 border-b-2 border-brand-200 bg-transparent px-0 py-3 text-2xl text-brand-900 outline-none transition placeholder:text-brand-300 focus:border-brand-600"
                         />
@@ -487,16 +538,18 @@ function Formulario() {
                               inputRef.current = el;
                             }}
                             type={step.kind === 'tel' ? 'tel' : 'text'}
-                            inputMode={step.kind === 'tel' ? 'tel' : 'text'}
+                            inputMode={step.kind === 'tel' ? 'numeric' : 'text'}
                             autoComplete={step.kind === 'tel' ? 'tel' : 'on'}
+                            pattern={step.kind === 'tel' ? '[0-9+\\-()\\s]*' : undefined}
                             value={formData[step.id]}
-                            onChange={(e) => updateField(step.id, e.target.value)}
+                            onChange={(e) =>
+                              updateField(step.id, e.target.value, step.kind)
+                            }
                             onBlur={(e) => {
                               if (step.kind !== 'tel') return;
+                              const phone = sanitizePhoneInput(e.target.value);
                               setWhatsappTouched(true);
-                              setErrorMessage(
-                                whatsappStepError(e.target.value) ?? '',
-                              );
+                              setErrorMessage(whatsappStepError(phone) ?? '');
                             }}
                             placeholder={step.placeholder}
                             className="w-full border-0 border-b-2 border-brand-200 bg-transparent px-0 py-3 text-2xl text-brand-900 outline-none transition placeholder:text-brand-300 focus:border-brand-600"
